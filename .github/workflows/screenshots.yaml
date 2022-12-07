@@ -7,11 +7,17 @@ on:
     branches: [ main ]
 
 jobs:
-  linux:
-    name: Linux
-    runs-on: ubuntu-latest
+  screenshot:
+    runs-on: ${{ matrix.os }}
     env:
       DISPLAY: ":1"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        perl: [ 'latest' ]
+        dist: [ 'strawberry' ]
+    name: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
@@ -20,69 +26,59 @@ jobs:
     - run: pip install meson ninja
     - uses: seanmiddleditch/gha-setup-ninja@master
     - name: Install gtk+-3.0 (Linux)
-      run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev
-    - name: Set up perl
-      uses: shogo82148/actions-setup-perl@v1
-      with:
-        perl-version: latest
-    - run: perl -V
-    - run: cpanm -n -v LibUI Imager Imager::Screenshot
-    - name: Smoke test
-      run: |
-        Xvfb :1 &
-        perl LibUI.pl
-        killall Xvfb
-    - name: Upload smoke test artifacts
-      uses: actions/upload-artifact@v3.1.1
-      with:
-        name: screenshot-linux.png
-        path: screenshot.png
-
-  windows:
-    name: Windows
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-      with:
-        python-version: '3.x'
-    - run: pip install meson ninja
-    - uses: seanmiddleditch/gha-setup-ninja@master
+      if: ${{ startsWith( matrix.os, 'ubuntu-' )  }}
+      run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev xvfb
+    - name: Install gtk+-3.0 (OSX)
+      if: ${{ startsWith( matrix.os, 'macos-' ) }}
+      run: brew install gtk+3
     - name: Set up perl
       uses: shogo82148/actions-setup-perl@v1
       with:
         perl-version: latest
         distribution: strawberry
     - run: perl -V
-    - run: cpanm -n -v LibUI Imager Imager::Screenshot
-    - run: perl LibUI.pl
+    - run: cpanm -n -v inc::latest https://github.com/sanko/Affix.pm/archive/refs/heads/dev.zip LibUI Imager Imager::Screenshot
+    - name: Init Xvfb
+      if: ${{ startsWith( matrix.os, 'ubuntu-' )  }}
+      run: Xvfb :1 &
+    - name: Run scripts and take screenshots
+      run: |
+            perl LibUI.pl
+            perl LibUI_Button.pl
+            perl LibUI_Checkbox.pl
+            perl LibUI_ColorButton.pl
+            perl LibUI_Combobox.pl
+            perl LibUI_DatePicker.pl
+            perl LibUI_DateTimePicker.pl
+            perl LibUI_EditableCombobox.pl
+            perl LibUI_Entry.pl
+            perl LibUI_FontButton.pl
+            perl LibUI_Form.pl
+            perl LibUI_Grid.pl
+            perl LibUI_Group.pl
+            perl LibUI_HBox.pl
+            perl LibUI_HorizontalSeparator.pl
+            perl LibUI_Label.pl
+            perl LibUI_Menu.pl
+            perl LibUI_MenuItem.pl
+            perl LibUI_MultilineEntry.pl
+            perl LibUI_NonWrappingMultilineEntry.pl
+            perl LibUI_PasswordEntry.pl
+            perl LibUI_ProgressBar.pl
+            perl LibUI_RadioButtons.pl
+            perl LibUI_SearchEntry.pl
+            perl LibUI_Slider.pl
+            perl LibUI_Spinbox.pl
+            perl LibUI_Tab.pl
+            perl LibUI_TimePicker.pl
+            perl LibUI_VBox.pl
+            perl LibUI_VerticalSeparator.pl
+            perl LibUI_Window.pl
+    - name: Kill Xvfb
+      if: ${{ startsWith( matrix.os, 'ubuntu-' )  }}
+      run: killall Xvfb
     - name: Upload smoke test artifacts
       uses: actions/upload-artifact@v3.1.1
       with:
-        name: screenshot-windows.png
-        path: screenshot.png
-
-  macos:
-    name: MacOS
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-      with:
-        python-version: '3.x'
-    - run: pip install meson ninja
-    - uses: seanmiddleditch/gha-setup-ninja@master
-    - name: Install gtk+-3.0 (OSX)
-      run: brew install gtk+3
-    - name: Set up perl
-      uses: shogo82148/actions-setup-perl@v1
-      with:
-        perl-version: latest
-    - run: perl -V
-    - run: cpanm -n -v LibUI Imager Imager::Screenshot
-    - run: perl LibUI.pl
-    - name: Upload smoke test artifacts
-      uses: actions/upload-artifact@v3.1.1
-      with:
-        name: screenshot-macos.png
-        path: screenshot.png
+        name: screenshot-${{ matrix.os }}-${{ matrix.file }}.png
+        path: ${{ github.workspace }}/**/*.png

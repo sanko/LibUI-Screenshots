@@ -19,7 +19,7 @@ Timer(
         my $img = screenshot() or die Imager->errstr;
 
         # and save it
-        $img->write( file => 'screenshot.png' ) or die $img->errstr;
+        $img->write( file => __FILE__ . '.png' ) or die $img->errstr;
         Quit;
     },
     undef
