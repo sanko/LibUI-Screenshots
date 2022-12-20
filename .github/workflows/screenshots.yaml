@@ -37,43 +37,16 @@ jobs:
         perl-version: latest
         distribution: strawberry
     - run: perl -V
-    - run: cpanm -n -v inc::latest https://github.com/sanko/Affix.pm/archive/refs/heads/dev.zip LibUI Imager Imager::Screenshot
+    - run: |    
+           cpanm -n -v inc::latest https://github.com/sanko/Affix.pm/archive/refs/heads/dev.zip LibUI Imager Imager::Screenshot
+           
+           1
     - name: Init Xvfb
       if: ${{ startsWith( matrix.os, 'ubuntu-' )  }}
       run: Xvfb :1 &
     - name: Run scripts and take screenshots
       run: |
-            perl LibUI.pl
-            perl LibUI_Button.pl
-            perl LibUI_Checkbox.pl
-            perl LibUI_ColorButton.pl
-            perl LibUI_Combobox.pl
-            perl LibUI_DatePicker.pl
-            perl LibUI_DateTimePicker.pl
-            perl LibUI_EditableCombobox.pl
-            perl LibUI_Entry.pl
-            perl LibUI_FontButton.pl
-            perl LibUI_Form.pl
-            perl LibUI_Grid.pl
-            perl LibUI_Group.pl
-            perl LibUI_HBox.pl
-            perl LibUI_HorizontalSeparator.pl
-            perl LibUI_Label.pl
-            perl LibUI_Menu.pl
-            perl LibUI_MenuItem.pl
-            perl LibUI_MultilineEntry.pl
-            perl LibUI_NonWrappingMultilineEntry.pl
-            perl LibUI_PasswordEntry.pl
-            perl LibUI_ProgressBar.pl
-            perl LibUI_RadioButtons.pl
-            perl LibUI_SearchEntry.pl
-            perl LibUI_Slider.pl
-            perl LibUI_Spinbox.pl
-            perl LibUI_Tab.pl
-            perl LibUI_TimePicker.pl
-            perl LibUI_VBox.pl
-            perl LibUI_VerticalSeparator.pl
-            perl LibUI_Window.pl
+            perl LibUI.pl            
     - name: Kill Xvfb
       if: ${{ startsWith( matrix.os, 'ubuntu-' )  }}
       run: killall Xvfb
