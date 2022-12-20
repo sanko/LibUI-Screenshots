@@ -3,6 +3,7 @@ use LibUI::Window;
 use LibUI::Label;
 Init( { Size => 1024 } ) && die;
 my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
 $window->setChild( LibUI::Label->new('Hello, World!') );
 $window->onClosing(
     sub {
