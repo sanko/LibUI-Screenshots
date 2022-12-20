@@ -38,7 +38,7 @@ jobs:
         distribution: strawberry
     - run: perl -V
     - run: |    
-           cpanm -n Affix https://github.com/sanko/LibUI.pm/archive/refs/heads/main.zip Imager Imager::Screenshot
+           cpanm -n -v Affix https://github.com/sanko/LibUI.pm/archive/refs/heads/main.zip Imager Imager::Screenshot
            
     - name: Init Xvfb
       if: ${{ startsWith( matrix.os, 'ubuntu-' )  }}
